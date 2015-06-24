@@ -136,8 +136,6 @@ class I18n
                         }
                     }
                 }
-            } else {
-                throw new Exception('Error: There was an error processing that XML file.');
             }
         // Else if a JSON file
         } else if (file_exists($langFile) && (stripos($langFile, '.json') !== false)) {

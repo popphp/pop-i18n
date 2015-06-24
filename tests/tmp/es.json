@@ -1,0 +1,19 @@
+{
+    "language"  : {
+        "src"    : "en",
+        "output" : "es",
+        "name"   : "Spanish",
+        "native" : "Español",
+        "locale" : [{
+            "region" : "ES",
+            "name"   : "España",
+            "native" : "España",
+            "text"   : [
+                {
+                    "source" : "Hello, how are you?",
+                    "output" : "Hola, cómo estás?"
+                }
+            ]
+        }]
+    }
+}

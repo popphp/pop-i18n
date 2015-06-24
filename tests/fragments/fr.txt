@@ -1,0 +1,3 @@
+Bonjour, comment allez-vous?
+Bonjour, comment allez-vous, %1?
+Je vais bien, %1. Comment est %2?

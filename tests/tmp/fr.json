@@ -1,0 +1,27 @@
+{
+    "language"  : {
+        "src"    : "en",
+        "output" : "fr",
+        "name"   : "French",
+        "native" : "Française",
+        "locale" : [{
+            "region" : "FR",
+            "name"   : "France",
+            "native" : "France",
+            "text"   : [
+                {
+                    "source" : "Hello, how are you?",
+                    "output" : "Bonjour, comment allez-vous?"
+                },
+                {
+                    "source" : "Hello, how are you, %1?",
+                    "output" : "Bonjour, comment allez-vous, %1?"
+                },
+                {
+                    "source" : "I'm fine, %1. How's %2?",
+                    "output" : "Je vais bien, %1. Comment est %2?"
+                }
+            ]
+        }]
+    }
+}
