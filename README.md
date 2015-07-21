@@ -170,3 +170,5 @@ Format\Xml::createFragment('source/en.txt', 'output/de.txt', '/path/to/files/');
 // Create the JSON format fragment
 Format\Json::createFragment('source/en.txt', 'output/de.txt', '/path/to/files/');
 ```
+
+And merge the fragments into a main language file. 
