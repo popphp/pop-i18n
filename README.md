@@ -2,7 +2,7 @@ pop-i18n
 ========
 
 [![Build Status](https://travis-ci.org/popphp/pop-i18n.svg?branch=master)](https://travis-ci.org/popphp/pop-i18n)
-[![Coverage Status](http://www.popphp.org/cc/coverage.php?comp=pop-i18n)](http://www.popphp.org/cc/pop-i18n/)
+[![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-i18n)](http://cc.popphp.org/pop-i18n/)
 
 OVERVIEW
 --------
@@ -171,4 +171,4 @@ Format\Xml::createFragment('source/en.txt', 'output/de.txt', '/path/to/files/');
 Format\Json::createFragment('source/en.txt', 'output/de.txt', '/path/to/files/');
 ```
 
-And merge the fragments into a main language file. 
+And merge the fragments into a main language file.
