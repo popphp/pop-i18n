@@ -1,6 +1,10 @@
 pop-i18n
 ========
 
+END OF LIFE
+-----------
+The `pop-i18n` component v2.1.0 is now end-of-life and will no longer be maintained.
+
 [![Build Status](https://travis-ci.org/popphp/pop-i18n.svg?branch=master)](https://travis-ci.org/popphp/pop-i18n)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-i18n)](http://cc.popphp.org/pop-i18n/)
 
