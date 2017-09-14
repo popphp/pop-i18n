@@ -51,7 +51,7 @@ class JsonFormatTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFileNoSrcException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         $lang = [
             "output" => "fr",
             "name"   => "French",
@@ -64,7 +64,7 @@ class JsonFormatTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFileNoOutputException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         $lang = [
             "src"    => "en",
             "name"   => "French",
@@ -77,7 +77,7 @@ class JsonFormatTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFileNoRegionException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         $lang = [
             "src"    => "en",
             "output" => "fr",
@@ -102,7 +102,7 @@ class JsonFormatTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFileNoTextException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         $lang = [
             "src"    => "en",
             "output" => "fr",
@@ -122,7 +122,7 @@ class JsonFormatTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFileTextNotArrayException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         $lang = [
             "src"    => "en",
             "output" => "fr",
@@ -150,19 +150,19 @@ class JsonFormatTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFragmentNoSourceException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         Json::createFragment(__DIR__ . '/fragments/bad.txt', __DIR__ . '/fragments/fr.txt');
     }
 
     public function testCreateFragmentNoOutputException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         Json::createFragment(__DIR__ . '/fragments/en.txt', __DIR__ . '/fragments/bad.txt');
     }
 
     public function testCreateFragmentNoTargetDirException()
     {
-        $this->setExpectedException('Pop\I18n\Format\Exception');
+        $this->expectException('Pop\I18n\Format\Exception');
         Json::createFragment(__DIR__ . '/fragments/en.txt', __DIR__ . '/fragments/fr.txt', 'baddir');
     }
 

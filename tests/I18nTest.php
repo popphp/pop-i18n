@@ -73,7 +73,7 @@ class I18nTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadFileBadXmlException()
     {
-        $this->setExpectedException('Exception');
+        $this->expectException('Exception');
         $i18n = new I18n('it', __DIR__ . '/tmp2');
     }
 
