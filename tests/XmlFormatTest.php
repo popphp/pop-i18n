@@ -4,8 +4,9 @@ namespace Pop\I18n\Test;
 
 use Pop\I18n\I18n;
 use Pop\I18n\Format\Xml;
+use PHPUnit\Framework\TestCase;
 
-class XmlFormatTest extends \PHPUnit_Framework_TestCase
+class XmlFormatTest extends TestCase
 {
 
     public function testCreateFile()

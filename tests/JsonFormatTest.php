@@ -4,8 +4,9 @@ namespace Pop\I18n\Test;
 
 use Pop\I18n\I18n;
 use Pop\I18n\Format\Json;
+use PHPUnit\Framework\TestCase;
 
-class JsonFormatTest extends \PHPUnit_Framework_TestCase
+class JsonFormatTest extends TestCase
 {
 
     public function testCreateFile()

@@ -3,8 +3,9 @@
 namespace Pop\I18n\Test;
 
 use Pop\I18n\I18n;
+use PHPUnit\Framework\TestCase;
 
-class I18nTest extends \PHPUnit_Framework_TestCase
+class I18nTest extends TestCase
 {
 
     public function testConstructor()
@@ -59,7 +60,7 @@ class I18nTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadFileDoesNotExistException()
     {
-        $this->setExpectedException('Pop\I18n\Exception');
+        $this->expectException('Pop\I18n\Exception');
         $i18n = new I18n('fr');
         $i18n->loadFile(__DIR__ . '/tmp/bad.xml');
     }
