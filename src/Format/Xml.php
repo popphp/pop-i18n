@@ -21,7 +21,7 @@ namespace Pop\I18n\Format;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.0.3
+ * @version    3.1.0
  */
 class Xml
 {
@@ -106,7 +106,16 @@ class Xml
                 }
                 $xmlLocales .= '        <text>' . PHP_EOL;
                 $xmlLocales .= '            <source>' . $text['source'] . '</source>' . PHP_EOL;
-                $xmlLocales .= '            <output>' . $text['output'] . '</output>' . PHP_EOL;
+                if (is_array($text['output'])) {
+                    $xmlLocales .= '            <output>' . PHP_EOL;
+                    foreach ($text['output'] as $alt => $output) {
+                        $altAttrib   = (!is_numeric($alt)) ? ' alt="' . $alt . '"' : null;
+                        $xmlLocales .= '                <output' . $altAttrib . '>' . $output . '</output>' . PHP_EOL;
+                    }
+                    $xmlLocales .= '            </output>' . PHP_EOL;
+                } else {
+                    $xmlLocales .= '            <output>' . $text['output'] . '</output>' . PHP_EOL;
+                }
                 $xmlLocales .= '        </text>' . PHP_EOL;
             }
             $xmlLocales .= '    </locale>' . PHP_EOL;

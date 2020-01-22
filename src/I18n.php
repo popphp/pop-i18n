@@ -21,7 +21,7 @@ namespace Pop\I18n;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2020 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.0.3
+ * @version    3.1.0
  */
 class I18n
 {
@@ -60,7 +60,6 @@ class I18n
      *
      * @param  string $lang
      * @param  string $dir
-     * @return I18n
      */
     public function __construct($lang = null, $dir = null)
     {
@@ -69,9 +68,9 @@ class I18n
         }
 
         if (strpos($lang, '_') !== false) {
-            $ary = explode('_', $lang);
-            $this->language = $ary[0];
-            $this->locale   = $ary[1];
+            [$language, $locale] = explode('_', $lang);
+            $this->language = $language;
+            $this->locale   = $locale;
         } else {
             $this->language = $lang;
             $this->locale   = strtoupper($lang);
@@ -130,7 +129,22 @@ class I18n
                     foreach ($xml->locale[$key]->text as $text) {
                         if (isset($text->source) && isset($text->output)) {
                             $this->content['source'][] = (string)$text->source;
-                            $this->content['output'][] = (string)$text->output;
+                            if (isset($text->output->output)) {
+                                $alternates = [];
+
+                                foreach ($text->output->output as $output) {
+                                    $alt = $output->attributes()->alt;
+                                    if (null !== $alt) {
+                                        $alternates[(string)$alt] = (string)$output;
+                                    } else {
+                                        $alternates[] = (string)$output;
+                                    }
+                                }
+
+                                $this->content['output'][] = $alternates;
+                            } else {
+                                $this->content['output'][] = (string)$text->output;
+                            }
                         }
                     }
                 }
@@ -153,7 +167,7 @@ class I18n
                 foreach ($json['language']['locale'][$key]['text'] as $text) {
                     if (isset($text['source']) && isset($text['output'])) {
                         $this->content['source'][] = (string)$text['source'];
-                        $this->content['output'][] = (string)$text['output'];
+                        $this->content['output'][] = (is_array($text['output'])) ? $text['output'] : (string)$text['output'];
                     }
                 }
             }
@@ -165,25 +179,27 @@ class I18n
     /**
      * Return the translated string
      *
-     * @param  string $str
+     * @param  string       $str
      * @param  string|array $params
+     * @param  mixed        $variation
      * @return string
      */
-    public function __($str, $params = null)
+    public function __($str, $params = null, $variation = null)
     {
-        return $this->translate($str, $params);
+        return $this->translate($str, $params, $variation);
     }
 
     /**
      * Echo the translated string
      *
-     * @param  string $str
+     * @param  string       $str
      * @param  string|array $params
+     * @param  mixed        $variation
      * @return void
      */
-    public function _e($str, $params = null)
+    public function _e($str, $params = null, $variation = null)
     {
-        echo $this->translate($str, $params);
+        echo $this->translate($str, $params, $variation);
     }
 
     /**
@@ -238,14 +254,31 @@ class I18n
     /**
      * Translate and return the string
      *
-     * @param  string $str
+     * @param  string       $str
      * @param  string|array $params
+     * @param  mixed        $variation
      * @return string
      */
-    protected function translate($str, $params = null)
+    protected function translate($str, $params = null, $variation = null)
     {
         $key   = array_search($str, $this->content['source']);
-        $trans = ($key !== false) ? $this->content['output'][$key] : $str;
+        $trans = null;
+
+        if (($key !== false) && isset($this->content['output'][$key])) {
+            if ((null !== $variation) && isset($this->content['output'][$key][$variation])) {
+                $trans = $this->content['output'][$key][$variation];
+            } else {
+                if (is_array($this->content['output'][$key])) {
+                    $trans = reset($this->content['output'][$key]);
+                } else {
+                    $trans = $this->content['output'][$key];
+                }
+            }
+        }
+
+        if (null === $trans) {
+            $trans = $str;
+        }
 
         if (null !== $params) {
             if (is_array($params)) {
