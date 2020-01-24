@@ -52,6 +52,21 @@ class I18nTest extends TestCase
         $this->assertEquals('Je vais bien, Nick. Comment est Krissy?', $i18n->__("I'm fine, %1. How's %2?", ['Nick', 'Krissy']));
     }
 
+    public function testLoadXmlFileWithXmlAlts()
+    {
+        $i18n = new I18n('fr', __DIR__ . '/tmp3');
+
+        $this->assertEquals('Bonjour, je aime programmer PHP. Mon nom est Nick', $i18n->__('Hello, my name is %1. I love to program %2.', ['Nick', 'PHP'], 'secondary'));
+        $this->assertEquals('Depuis 20 ans, je programme PHP', $i18n->__('I have been programming %1 for %2 years.', ['PHP', '20'], 1));
+    }
+
+    public function testLoadXmlFileWithXmlAltsNoFind()
+    {
+        $i18n = new I18n('fr', __DIR__ . '/tmp3');
+
+        $this->assertEquals('Hello everyone, my name is Nick. I love to program PHP.', $i18n->__('Hello everyone, my name is %1. I love to program %2.', ['Nick', 'PHP'], 'secondary'));
+    }
+
     public function testLoadDefaultJsonFile()
     {
         $i18n = new I18n('es', __DIR__ . '/tmp');

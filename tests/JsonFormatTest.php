@@ -50,6 +50,54 @@ class JsonFormatTest extends TestCase
         unlink(__DIR__ . '/fr.json');
     }
 
+    public function testCreateFileWithAlts()
+    {
+        $lang = [
+            "src"    => "en",
+            "output" => "fr",
+            "name"   => "French",
+            "native" => "Française"
+        ];
+
+        $locales = [
+            [
+                "region" => "FR",
+                "name"   => "France",
+                "native" => "France",
+                "text"   => [
+                    [
+                        "source" => "Hello, how are you?",
+                        "output" => [
+                            "Bonjour, comment allez-vous?",
+                            "Bonjour, mon amie, comment allez-vous?"
+                        ]
+                    ],
+                    [
+                        "source" => "Hello, how are you, %1?",
+                        "output" => "Bonjour, comment allez-vous, %1?"
+                    ],
+                    [
+                        "source" => "I'm fine, %1. How's %2?",
+                        "output" => [
+                            "primary"   => "Je vais bien, %1. Comment est %2?",
+                            "secondary" => "Bien, %1. Comment est %2?",
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        Json::createFile($lang, $locales, __DIR__ . '/fr.json');
+        $this->assertFileExists(__DIR__ . '/fr.json');
+
+        $i18n = new I18n('fr');
+        $i18n->loadFile(__DIR__ . '/fr.json');
+        $this->assertEquals('Bonjour, mon amie, comment allez-vous?', $i18n->__('Hello, how are you?', null, 1));
+        $this->assertEquals('Bien, Nick. Comment est Krissy?', $i18n->__("I'm fine, %1. How's %2?", ['Nick', 'Krissy'], 'secondary'));
+
+        unlink(__DIR__ . '/fr.json');
+    }
+
     public function testCreateFileNoSrcException()
     {
         $this->expectException('Pop\I18n\Format\Exception');

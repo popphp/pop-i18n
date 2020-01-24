@@ -268,11 +268,8 @@ class I18n
             if ((null !== $variation) && isset($this->content['output'][$key][$variation])) {
                 $trans = $this->content['output'][$key][$variation];
             } else {
-                if (is_array($this->content['output'][$key])) {
-                    $trans = reset($this->content['output'][$key]);
-                } else {
-                    $trans = $this->content['output'][$key];
-                }
+                $trans = (is_array($this->content['output'][$key])) ?
+                    reset($this->content['output'][$key]) : $this->content['output'][$key];
             }
         }
 

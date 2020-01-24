@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE language [
+        <!ELEMENT language ANY>
+        <!ELEMENT locale ANY>
+        <!ELEMENT text (source,output)>
+        <!ELEMENT source ANY>
+        <!ELEMENT output ANY>
+        <!ATTLIST language
+                src       CDATA    #REQUIRED
+                output    CDATA    #REQUIRED
+                name      CDATA    #REQUIRED
+                native    CDATA    #REQUIRED
+                >
+        <!ATTLIST locale
+                region    CDATA    #REQUIRED
+                name      CDATA    #REQUIRED
+                native    CDATA    #REQUIRED
+                >
+        ]>
+<language src="en" output="fr" name="French" native="Français">
+    <locale region="FR" name="France" native="France">
+        <text>
+            <source>Hello, my name is %1. I love to program %2.</source>
+            <output>
+                <output alt="primary">Bonjour, mon nom est %1. Je aime programmer %2.</output>
+                <output alt="secondary">Bonjour, je aime programmer %2. Mon nom est %1</output>
+            </output>
+        </text>
+        <text>
+            <source>I have been programming %1 for %2 years.</source>
+            <output>
+                <output>Je programme %1 depuis %2 ans.</output>
+                <output>Depuis %2 ans, je programme %1</output>
+            </output>
+        </text>
+    </locale>
+</language>
