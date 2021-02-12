@@ -1,7 +1,7 @@
 pop-i18n
 ========
 
-[![Build Status](https://travis-ci.org/popphp/pop-i18n.svg?branch=master)](https://travis-ci.org/popphp/pop-i18n)
+[![Build Status](https://github.com/popphp/pop-i18n/workflows/phpunit/badge.svg)](https://github.com/popphp/pop-i18n/actions)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-i18n)](http://cc.popphp.org/pop-i18n/)
 
 OVERVIEW

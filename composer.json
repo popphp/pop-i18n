@@ -23,10 +23,10 @@
         }
     ],
     "require": {
-        "php": ">=7.1.0"
+        "php": ">=7.3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0.0"
+        "phpunit/phpunit": "^9.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -38,9 +38,12 @@
             "Pop\\I18n\\Test\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0.x-dev"
+            "dev-master": "3.2.x-dev"
         }
     }
 }
