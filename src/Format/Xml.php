@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\I18n\Format;
  * @category   Pop
  * @package    Pop_I18n
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.2.0
+ * @version    4.0.0
  */
 class Xml
 {
@@ -57,7 +57,7 @@ class Xml
      * @throws Exception
      * @return void
      */
-    public static function createFile(array $lang, array $locales, $file)
+    public static function createFile(array $lang, array $locales, string $file): void
     {
         // Validate the $lang parameter
         if (!isset($lang['src']) || !isset($lang['output'])) {
@@ -129,13 +129,13 @@ class Xml
      * Create an language file fragment from a source file and an output file,
      * each entry separated by a new line
      *
-     * @param  string $source
-     * @param  string $output
-     * @param  string $dir
+     * @param  string  $source
+     * @param  string  $output
+     * @param  ?string $dir
      * @throws Exception
      * @return void
      */
-    public static function createFragment($source, $output, $dir = null)
+    public static function createFragment(string $source, string $output, ?string $dir = null): void
     {
         if (!file_exists($source)) {
             throw new Exception('Error: The source file does not exist.');
@@ -147,16 +147,16 @@ class Xml
         $sourceLines = explode(PHP_EOL, file_get_contents($source));
         $outputLines = explode(PHP_EOL, file_get_contents($output));
 
-        $targetDir = (null !== $dir) ? $dir : dirname($output);
+        $targetDir = ($dir !== null) ? $dir : dirname($output);
 
         if (!file_exists($targetDir)) {
             throw new Exception('Error: The target directory does not exist.');
         }
 
-        if (strpos($output, '/') !== false) {
+        if (str_contains($output, '/')) {
             $lang = substr($output, (strrpos($output, '/') + 1));
             $lang = substr($lang, 0, strpos($lang, '.'));
-        } else if (strpos($output, "\\") !== false) {
+        } else if (str_contains($output, "\\")) {
             $lang = substr($output, (strrpos($output, "\\") + 1));
             $lang = substr($lang, 0, strpos($lang, '.'));
         } else {

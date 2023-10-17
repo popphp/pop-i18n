@@ -19,6 +19,13 @@ Install `pop-i18n` using Composer.
 
     composer require popphp/pop-i18n
 
+Or, require it in your composer.json file
+
+    "require": {
+        "popphp/pop-i18n" : "^4.0.0"
+    }
+
+
 BASIC USAGE
 -----------
 

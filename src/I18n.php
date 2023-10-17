@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,42 +13,44 @@
  */
 namespace Pop\I18n;
 
+use SimpleXMLElement;
+
 /**
  * I18n and l10n class
  *
  * @category   Pop
  * @package    Pop_I18n
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.2.0
+ * @version    4.0.0
  */
 class I18n
 {
 
     /**
      * Directory with language files in it
-     * @var string
+     * @var ?string
      */
-    protected $directory = null;
+    protected ?string $directory = null;
 
     /**
      * Default system language
-     * @var string
+     * @var ?string
      */
-    protected $language = null;
+    protected ?string $language = null;
 
     /**
      * Default system locale
      * @var string
      */
-    protected $locale = null;
+    protected ?string $locale = null;
 
     /**
      * Language content
      * @var array
      */
-    protected $content = [
+    protected array $content = [
         'source' => [],
         'output' => []
     ];
@@ -58,16 +60,16 @@ class I18n
      *
      * Instantiate the I18n object
      *
-     * @param  string $lang
-     * @param  string $dir
+     * @param  ?string $lang
+     * @param  ?string $dir
      */
-    public function __construct($lang = null, $dir = null)
+    public function __construct(?string $lang = null, ?string $dir = null)
     {
-        if (null === $lang) {
+        if ($lang === null) {
             $lang = (defined('POP_LANG')) ? POP_LANG : 'en_US';
         }
 
-        if (strpos($lang, '_') !== false) {
+        if (str_contains($lang, '_')) {
             [$language, $locale] = explode('_', $lang);
             $this->language = $language;
             $this->locale   = $locale;
@@ -76,7 +78,7 @@ class I18n
             $this->locale   = strtoupper($lang);
         }
 
-        $this->directory = ((null !== $dir) && file_exists($dir)) ? realpath($dir) . DIRECTORY_SEPARATOR
+        $this->directory = (($dir !== null) && file_exists($dir)) ? realpath($dir) . DIRECTORY_SEPARATOR
             : __DIR__ . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
 
         $this->loadCurrentLanguage();
@@ -87,7 +89,7 @@ class I18n
      *
      * @return string
      */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
@@ -97,7 +99,7 @@ class I18n
      *
      * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
@@ -106,14 +108,14 @@ class I18n
      * Load language content from an XML file
      *
      * @param  string $langFile
-     * @throws Exception
+     * @throws Exception|\Exception
      * @return void
      */
-    public function loadFile($langFile)
+    public function loadFile(string $langFile): void
     {
         // If an XML file
         if (file_exists($langFile) && (stripos($langFile, '.xml') !== false)) {
-            if (($xml =@ new \SimpleXMLElement($langFile, LIBXML_NOWARNING, true)) !== false) {
+            if (($xml =@ new SimpleXMLElement($langFile, LIBXML_NOWARNING, true)) !== false) {
                 $key    = 0;
                 $length = count($xml->locale);
 
@@ -134,7 +136,7 @@ class I18n
 
                                 foreach ($text->output->output as $output) {
                                     $alt = $output->attributes()->alt;
-                                    if (null !== $alt) {
+                                    if ($alt !== null) {
                                         $alternates[(string)$alt] = (string)$output;
                                     } else {
                                         $alternates[] = (string)$output;
@@ -179,12 +181,12 @@ class I18n
     /**
      * Return the translated string
      *
-     * @param  string       $str
-     * @param  string|array $params
-     * @param  mixed        $variation
+     * @param  string            $str
+     * @param  string|array|null $params
+     * @param  mixed             $variation
      * @return string
      */
-    public function __($str, $params = null, $variation = null)
+    public function __(string $str, string|array|null $params = null, mixed $variation = null): string
     {
         return $this->translate($str, $params, $variation);
     }
@@ -192,12 +194,12 @@ class I18n
     /**
      * Echo the translated string
      *
-     * @param  string       $str
-     * @param  string|array $params
-     * @param  mixed        $variation
+     * @param  string            $str
+     * @param  string|array|null $params
+     * @param  mixed             $variation
      * @return void
      */
-    public function _e($str, $params = null, $variation = null)
+    public function _e(string $str, string|array|null $params = null, mixed $variation = null): void
     {
         echo $this->translate($str, $params, $variation);
     }
@@ -205,10 +207,11 @@ class I18n
     /**
      * Get languages from the XML files
      *
-     * @param  string $dir
+     * @param string $dir
      * @return array
+     * @throws \Exception
      */
-    public static function getLanguages($dir)
+    public static function getLanguages(string $dir): array
     {
         $langsAry      = [];
         $langDirectory = $dir;
@@ -217,7 +220,7 @@ class I18n
             $files = scandir($langDirectory);
             foreach ($files as $file) {
                 if (stripos($file, '.xml')) {
-                    if (($xml =@ new \SimpleXMLElement($langDirectory . DIRECTORY_SEPARATOR . $file, LIBXML_NOWARNING, true)) !== false) {
+                    if (($xml =@ new SimpleXMLElement($langDirectory . DIRECTORY_SEPARATOR . $file, LIBXML_NOWARNING, true)) !== false) {
                         $lang       = (string)$xml->attributes()->output;
                         $langName   = (string)$xml->attributes()->name;
                         $langNative = (string)$xml->attributes()->native;
@@ -254,18 +257,18 @@ class I18n
     /**
      * Translate and return the string
      *
-     * @param  string       $str
-     * @param  string|array $params
-     * @param  mixed        $variation
+     * @param  string            $str
+     * @param  string|array|null $params
+     * @param  mixed             $variation
      * @return string
      */
-    protected function translate($str, $params = null, $variation = null)
+    protected function translate(string $str, string|array|null$params = null, mixed $variation = null): string
     {
         $key   = array_search($str, $this->content['source']);
         $trans = null;
 
         if (($key !== false) && isset($this->content['output'][$key])) {
-            if ((null !== $variation) && isset($this->content['output'][$key][$variation])) {
+            if (($variation !== null) && isset($this->content['output'][$key][$variation])) {
                 $trans = $this->content['output'][$key][$variation];
             } else {
                 $trans = (is_array($this->content['output'][$key])) ?
@@ -273,11 +276,11 @@ class I18n
             }
         }
 
-        if (null === $trans) {
+        if ($trans === null) {
             $trans = $str;
         }
 
-        if (null !== $params) {
+        if ($params !== null) {
             if (is_array($params)) {
                 foreach ($params as $key => $value) {
                     $trans = str_replace('%' . ($key + 1), $value, $trans);
@@ -293,9 +296,10 @@ class I18n
     /**
      * Get language content from the XML file
      *
+     * @throws Exception
      * @return void
      */
-    protected function loadCurrentLanguage()
+    protected function loadCurrentLanguage(): void
     {
         if (file_exists($this->directory . $this->language . '.xml')) {
             $this->loadFile($this->directory . $this->language . '.xml');
