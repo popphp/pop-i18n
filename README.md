@@ -124,8 +124,8 @@ the I18n object will look for that as well. The default is `en_US`.
 
 [Top](#pop-i18n)
 
-ADVANCED USAGE
---------------
+Advanced
+--------
 
 The `pop-i18n` component comes with the functionality to assist you in generating your
 required language files. Knowing the time and possibly money required to translate
