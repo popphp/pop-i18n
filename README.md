@@ -4,7 +4,15 @@ pop-i18n
 [![Build Status](https://github.com/popphp/pop-i18n/workflows/phpunit/badge.svg)](https://github.com/popphp/pop-i18n/actions)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-i18n)](http://cc.popphp.org/pop-i18n/)
 
-OVERVIEW
+[![Join the chat at https://popphp.slack.com](https://media.popphp.org/img/slack.svg)](https://popphp.slack.com)
+[![Join the chat at https://discord.gg/D9JBxPa5](https://media.popphp.org/img/discord.svg)](https://discord.gg/D9JBxPa5)
+
+* [Overview](#overview)
+* [Install](#install)
+* [Quickstart](#quickstart)
+* [Advanced](#advanced)
+
+Overview
 --------
 `pop-i18n` is a component for internationalization and localization. It provides the features for
 translating and managing different languages and locales that may be required for an application.
@@ -12,7 +20,9 @@ It also provides for parameters to be injected into the text for personalization
 
 `pop-i18n` is a component of the [Pop PHP Framework](http://www.popphp.org/).
 
-INSTALL
+[Top](#pop-i18n)
+
+Install
 -------
 
 Install `pop-i18n` using Composer.
@@ -25,9 +35,10 @@ Or, require it in your composer.json file
         "popphp/pop-i18n" : "^4.0.0"
     }
 
+[Top](#pop-i18n)
 
-BASIC USAGE
------------
+Quickstart
+----------
 
 First, you will have to create your language and locale files. The accepted formats are either XML or JSON:
 
@@ -111,6 +122,7 @@ You can set the language and locale when you instantiate the I18n object like ab
 or if you prefer, you can set it in your application as a constant `POP_LANG` and
 the I18n object will look for that as well. The default is `en_US`.
 
+[Top](#pop-i18n)
 
 ADVANCED USAGE
 --------------
@@ -157,7 +169,7 @@ Format\Xml::createFile($lang, $locale, '/path/to/language/files/de.xml');
 Format\Json::createFile($lang, $locale, '/path/to/language/files/de.json');
 ```
 
-Also, if you have a a source text file and an output text file with a 1:1 line-by-line ratio,
+Also, if you have a source text file and an output text file with a 1:1 line-by-line ratio,
 then you can create the language files in fragment set and merge them as needed. An example
 of a 1:1 ratio source-to-output text files:
 
