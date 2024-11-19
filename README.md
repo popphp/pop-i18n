@@ -4,7 +4,6 @@ pop-i18n
 [![Build Status](https://github.com/popphp/pop-i18n/workflows/phpunit/badge.svg)](https://github.com/popphp/pop-i18n/actions)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-i18n)](http://cc.popphp.org/pop-i18n/)
 
-[![Join the chat at https://popphp.slack.com](https://media.popphp.org/img/slack.svg)](https://popphp.slack.com)
 [![Join the chat at https://discord.gg/TZjgT74U7E](https://media.popphp.org/img/discord.svg)](https://discord.gg/TZjgT74U7E)
 
 * [Overview](#overview)
@@ -18,7 +17,7 @@ Overview
 translating and managing different languages and locales that may be required for an application.
 It also provides for parameters to be injected into the text for personalization.
 
-`pop-i18n` is a component of the [Pop PHP Framework](http://www.popphp.org/).
+`pop-i18n` is a component of the [Pop PHP Framework](https://www.popphp.org/).
 
 [Top](#pop-i18n)
 
