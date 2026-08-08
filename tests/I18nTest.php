@@ -73,6 +73,51 @@ class I18nTest extends TestCase
         $this->assertEquals('Hola, cómo estás?', $i18n->__('Hello, how are you?'));
     }
 
+    public function testTranslateParamContainingPlaceholderLiteralIsNotReSubstituted()
+    {
+        $i18n = new I18n('fr', __DIR__ . '/tmp');
+        $this->assertEquals(
+            'contains %2 literally and World',
+            $i18n->__('%1 and %2', ['contains %2 literally', 'World'])
+        );
+    }
+
+    public function testLoadXmlFileWithAltsDefaultsToFirstAlternateWhenNoVariationGiven()
+    {
+        $i18n = new I18n('fr', __DIR__ . '/tmp3');
+        $this->assertEquals(
+            'Bonjour, mon nom est Nick. Je aime programmer PHP.',
+            $i18n->__('Hello, my name is %1. I love to program %2.', ['Nick', 'PHP'])
+        );
+    }
+
+    public function testLoadXmlFileWithAltsDefaultsToFirstAlternateWhenVariationNotFound()
+    {
+        $i18n = new I18n('fr', __DIR__ . '/tmp3');
+        $this->assertEquals(
+            'Bonjour, mon nom est Nick. Je aime programmer PHP.',
+            $i18n->__('Hello, my name is %1. I love to program %2.', ['Nick', 'PHP'], 'tertiary')
+        );
+    }
+
+    public function testTranslateReturnsOriginalStringWhenNoLanguageFileLoaded()
+    {
+        $i18n = new I18n('de', __DIR__ . '/tmp');
+        $this->assertEquals('Untranslated string', $i18n->__('Untranslated string'));
+    }
+
+    public function testLoadXmlFileWithNoMatchingLocaleLeavesContentEmpty()
+    {
+        $i18n = new I18n('fr_CA', __DIR__ . '/tmp');
+        $this->assertEquals('Hello, how are you?', $i18n->__('Hello, how are you?'));
+    }
+
+    public function testConstructorFallsBackToBundledDataDirWhenGivenDirDoesNotExist()
+    {
+        $i18n = new I18n('fr', __DIR__ . '/does-not-exist');
+        $this->assertEquals('Hello, how are you?', $i18n->__('Hello, how are you?'));
+    }
+
     public function testLoadFileDoesNotExistException()
     {
         $this->expectException('Pop\I18n\Exception');
@@ -85,6 +130,18 @@ class I18nTest extends TestCase
         $langs = I18n::getLanguages(__DIR__ . '/tmp');
         $this->assertTrue(isset($langs['fr_FR']));
         $this->assertEquals('Française, France (French, France)', $langs['fr_FR']);
+    }
+
+    public function testGetLanguagesIncludesJsonSourcedEntries()
+    {
+        $langs = I18n::getLanguages(__DIR__ . '/tmp');
+        $this->assertTrue(isset($langs['es_ES']));
+        $this->assertEquals('Español, España (Spanish, España)', $langs['es_ES']);
+    }
+
+    public function testGetLanguagesReturnsEmptyArrayForNonexistentDirectory()
+    {
+        $this->assertEquals([], I18n::getLanguages(__DIR__ . '/does-not-exist'));
     }
 
     public function testLoadFileBadXmlException()

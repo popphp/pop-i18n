@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\I18n\Format;
  * @category   Pop
  * @package    Pop_I18n
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.0.3
+ * @version    4.1.0
  */
 class Xml
 {
@@ -81,40 +81,40 @@ class Xml
         $xmlHeader = substr($xmlHeader, 0, (strpos($xmlHeader, 'native="">') + 10));
         $xmlHeader = str_replace(
             ['src=""', 'output=""'],
-            ['src="' . $lang['src'] . '"', 'output="' . $lang['output'] . '"'],
+            ['src="' . self::escape($lang['src']) . '"', 'output="' . self::escape($lang['output']) . '"'],
             $xmlHeader
         );
 
         if (isset($lang['name'])) {
-            $xmlHeader = str_replace('name=""', 'name="' . $lang['name'] . '"', $xmlHeader);
+            $xmlHeader = str_replace('name=""', 'name="' . self::escape($lang['name']) . '"', $xmlHeader);
         }
 
         if (isset($lang['native'])) {
-            $xmlHeader = str_replace('native=""', 'native="' . $lang['native'] . '"', $xmlHeader);
+            $xmlHeader = str_replace('native=""', 'native="' . self::escape($lang['native']) . '"', $xmlHeader);
         }
 
         // Format the Locales
         $xmlLocales = null;
 
         foreach ($locales as $locale) {
-            $name = (isset($locale['name'])) ? $locale['name'] : null;
-            $native = (isset($locale['native'])) ? $locale['native'] : null;
-            $xmlLocales .= '    <locale region="' . $locale['region'] . '" name="' . $name . '" native="' . $native . '">' . PHP_EOL;
+            $name = (isset($locale['name'])) ? self::escape($locale['name']) : null;
+            $native = (isset($locale['native'])) ? self::escape($locale['native']) : null;
+            $xmlLocales .= '    <locale region="' . self::escape($locale['region']) . '" name="' . $name . '" native="' . $native . '">' . PHP_EOL;
             foreach ($locale['text'] as $text) {
                 if (!isset($text['source']) || !isset($text['output'])) {
                     throw new Exception("Error: The 'source' and 'output' keys must be defined in each 'text' array.");
                 }
                 $xmlLocales .= '        <text>' . PHP_EOL;
-                $xmlLocales .= '            <source>' . $text['source'] . '</source>' . PHP_EOL;
+                $xmlLocales .= '            <source>' . self::escape($text['source']) . '</source>' . PHP_EOL;
                 if (is_array($text['output'])) {
                     $xmlLocales .= '            <output>' . PHP_EOL;
                     foreach ($text['output'] as $alt => $output) {
-                        $altAttrib   = (!is_numeric($alt)) ? ' alt="' . $alt . '"' : null;
-                        $xmlLocales .= '                <output' . $altAttrib . '>' . $output . '</output>' . PHP_EOL;
+                        $altAttrib   = (!is_numeric($alt)) ? ' alt="' . self::escape($alt) . '"' : null;
+                        $xmlLocales .= '                <output' . $altAttrib . '>' . self::escape($output) . '</output>' . PHP_EOL;
                     }
                     $xmlLocales .= '            </output>' . PHP_EOL;
                 } else {
-                    $xmlLocales .= '            <output>' . $text['output'] . '</output>' . PHP_EOL;
+                    $xmlLocales .= '            <output>' . self::escape($text['output']) . '</output>' . PHP_EOL;
                 }
                 $xmlLocales .= '        </text>' . PHP_EOL;
             }
@@ -167,13 +167,24 @@ class Xml
 
         foreach ($outputLines as $key => $value) {
             if (!empty($value) && !empty($sourceLines[$key])) {
-                $xml .= '        <text>' . PHP_EOL . '            <source>' . $sourceLines[$key] . '</source>' . PHP_EOL .
-                    '            <output>' . $value . '</output>' . PHP_EOL .
+                $xml .= '        <text>' . PHP_EOL . '            <source>' . self::escape($sourceLines[$key]) . '</source>' . PHP_EOL .
+                    '            <output>' . self::escape($value) . '</output>' . PHP_EOL .
                     '        </text>' . PHP_EOL;
             }
         }
 
         file_put_contents($targetDir . DIRECTORY_SEPARATOR . $lang . '.xml', $xml);
+    }
+
+    /**
+     * Escape a value for safe use as XML element content or attribute value
+     *
+     * @param  string $value
+     * @return string
+     */
+    protected static function escape(string $value): string
+    {
+        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 
 }

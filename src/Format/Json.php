@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\I18n\Format;
  * @category   Pop
  * @package    Pop_I18n
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.0.3
+ * @version    4.1.0
  */
 class Json
 {
@@ -75,6 +75,11 @@ class Json
             if (!is_array($locale['text'])) {
                 throw new Exception("Error: The parameter key 'text' in each locale must be an array.");
             }
+            foreach ($locale['text'] as $text) {
+                if (!isset($text['source']) || !isset($text['output'])) {
+                    throw new Exception("Error: The 'source' and 'output' keys must be defined in each 'text' array.");
+                }
+            }
         }
 
         $lang['locale'] = $locales;
@@ -125,8 +130,8 @@ class Json
 
         foreach ($outputLines as $key => $value) {
             if (!empty($value) && !empty($sourceLines[$key])) {
-                $json .= '                    {' . PHP_EOL . '                        "source" : "' . $sourceLines[$key] . '",' . PHP_EOL .
-                    '                        "output" : "' . $value . '"' . PHP_EOL . '                    },' . PHP_EOL;
+                $json .= '                    {' . PHP_EOL . '                        "source" : ' . json_encode($sourceLines[$key]) . ',' . PHP_EOL .
+                    '                        "output" : ' . json_encode($value) . PHP_EOL . '                    },' . PHP_EOL;
             }
         }
 

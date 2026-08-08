@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -21,9 +21,9 @@ use SimpleXMLElement;
  * @category   Pop
  * @package    Pop_I18n
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.0.3
+ * @version    4.1.0
  */
 class I18n
 {
@@ -281,13 +281,11 @@ class I18n
         }
 
         if ($params !== null) {
-            if (is_array($params)) {
-                foreach ($params as $key => $value) {
-                    $trans = str_replace('%' . ($key + 1), $value, $trans);
-                }
-            } else {
-                $trans = str_replace('%1', $params, $trans);
+            $replacements = [];
+            foreach ((array)$params as $key => $value) {
+                $replacements['%' . ($key + 1)] = $value;
             }
+            $trans = strtr($trans, $replacements);
         }
 
         return $trans;

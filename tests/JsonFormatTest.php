@@ -190,11 +190,147 @@ class JsonFormatTest extends TestCase
         Json::createFile($lang, $locales, __DIR__ . '/fr.json');
     }
 
+    public function testCreateFileNoTextSourceException()
+    {
+        $this->expectException('Pop\I18n\Format\Exception');
+        $lang = [
+            "src"    => "en",
+            "output" => "fr",
+            "name"   => "French",
+            "native" => "Française"
+        ];
+
+        $locales = [
+            [
+                "region" => "FR",
+                "name"   => "France",
+                "native" => "France",
+                "text"   => [
+                    [
+                        "output" => "Bonjour, comment allez-vous?"
+                    ]
+                ]
+            ]
+        ];
+
+        Json::createFile($lang, $locales, __DIR__ . '/fr.json');
+    }
+
+    public function testCreateFileNoTextOutputException()
+    {
+        $this->expectException('Pop\I18n\Format\Exception');
+        $lang = [
+            "src"    => "en",
+            "output" => "fr",
+            "name"   => "French",
+            "native" => "Française"
+        ];
+
+        $locales = [
+            [
+                "region" => "FR",
+                "name"   => "France",
+                "native" => "France",
+                "text"   => [
+                    [
+                        "source" => "Hello, how are you?"
+                    ]
+                ]
+            ]
+        ];
+
+        Json::createFile($lang, $locales, __DIR__ . '/fr.json');
+    }
+
     public function testCreateFragment()
     {
         Json::createFragment(__DIR__ . '/fragments/en.txt', __DIR__ . '/fragments/fr.txt');
         $this->assertFileExists(__DIR__ . '/fragments/fr.json');
         unlink(__DIR__ . '/fragments/fr.json');
+    }
+
+    public function testCreateFragmentWithBareFilenameOutput()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__ . '/fragments');
+
+        try {
+            file_put_contents('bare-en.txt', 'Hello');
+            file_put_contents('bare-fr.txt', 'Bonjour');
+
+            Json::createFragment('bare-en.txt', 'bare-fr.txt');
+
+            $this->assertFileExists('bare-fr.json');
+
+            unlink('bare-en.txt');
+            unlink('bare-fr.txt');
+            unlink('bare-fr.json');
+        } finally {
+            chdir($cwd);
+        }
+    }
+
+    public function testCreateFragmentWithBackslashInOutputPath()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__ . '/fragments');
+
+        try {
+            // A backslash is a valid filename character on Linux, so this
+            // exercises the Windows-style-path branch without relying on OS.
+            $outputName = 'win\\bslash-fr.txt';
+
+            file_put_contents('bslash-en.txt', 'Hello');
+            file_put_contents($outputName, 'Bonjour');
+
+            Json::createFragment('bslash-en.txt', $outputName);
+
+            $this->assertFileExists('bslash-fr.json');
+
+            unlink('bslash-en.txt');
+            unlink($outputName);
+            unlink('bslash-fr.json');
+        } finally {
+            chdir($cwd);
+        }
+    }
+
+    public function testCreateFragmentSkipsBlankLines()
+    {
+        $sourceFile = __DIR__ . '/fragments/blank-en.txt';
+        $outputFile = __DIR__ . '/fragments/blank-fr.txt';
+
+        file_put_contents($sourceFile, 'Hello' . PHP_EOL . '' . PHP_EOL . 'Goodbye');
+        file_put_contents($outputFile, 'Bonjour' . PHP_EOL . '' . PHP_EOL . 'Au revoir');
+
+        Json::createFragment($sourceFile, $outputFile);
+
+        $fragment = file_get_contents(__DIR__ . '/fragments/blank-fr.json');
+        $this->assertSame(2, substr_count($fragment, '"source"'));
+
+        unlink($sourceFile);
+        unlink($outputFile);
+        unlink(__DIR__ . '/fragments/blank-fr.json');
+    }
+
+    public function testCreateFragmentEscapesJsonSpecialCharacters()
+    {
+        $sourceFile = __DIR__ . '/fragments/escape-en.txt';
+        $outputFile = __DIR__ . '/fragments/escape-fr.txt';
+
+        file_put_contents($sourceFile, 'She said "hi"');
+        file_put_contents($outputFile, 'Elle a dit "salut"');
+
+        Json::createFragment($sourceFile, $outputFile);
+
+        $fragment = file_get_contents(__DIR__ . '/fragments/escape-fr.json');
+
+        $this->assertStringContainsString('"source" : "She said \"hi\""', $fragment);
+        $this->assertStringContainsString('"output" : "Elle a dit \"salut\""', $fragment);
+
+        unlink($sourceFile);
+        unlink($outputFile);
+        unlink(__DIR__ . '/fragments/escape-fr.json');
     }
 
     public function testCreateFragmentNoSourceException()
