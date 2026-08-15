@@ -150,4 +150,10 @@ class I18nTest extends TestCase
         $i18n = new I18n('it', __DIR__ . '/tmp2');
     }
 
+    public function testGetLanguagesBadXmlException()
+    {
+        $this->expectException('Exception');
+        I18n::getLanguages(__DIR__ . '/tmp2');
+    }
+
 }

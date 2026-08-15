@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -115,38 +116,37 @@ class I18n
     {
         // If an XML file
         if (file_exists($langFile) && (stripos($langFile, '.xml') !== false)) {
-            if (($xml =@ new SimpleXMLElement($langFile, LIBXML_NOWARNING, true)) !== false) {
-                $key    = 0;
-                $length = count($xml->locale);
+            $xml    =@ new SimpleXMLElement($langFile, LIBXML_NOWARNING, true);
+            $key    = 0;
+            $length = count($xml->locale);
 
-                // Find the locale node key
-                for ($i = 0; $i < $length; $i++) {
-                    if ($this->locale == (string)$xml->locale[$i]->attributes()->region) {
-                        $key = $i;
-                    }
+            // Find the locale node key
+            for ($i = 0; $i < $length; $i++) {
+                if ($this->locale == (string)$xml->locale[$i]->attributes()->region) {
+                    $key = $i;
                 }
+            }
 
-                // If the locale node matches the current locale
-                if ($this->locale == (string)$xml->locale[$key]->attributes()->region) {
-                    foreach ($xml->locale[$key]->text as $text) {
-                        if (isset($text->source) && isset($text->output)) {
-                            $this->content['source'][] = (string)$text->source;
-                            if (isset($text->output->output)) {
-                                $alternates = [];
+            // If the locale node matches the current locale
+            if ($this->locale == (string)$xml->locale[$key]->attributes()->region) {
+                foreach ($xml->locale[$key]->text as $text) {
+                    if (isset($text->source) && isset($text->output)) {
+                        $this->content['source'][] = (string)$text->source;
+                        if (isset($text->output->output)) {
+                            $alternates = [];
 
-                                foreach ($text->output->output as $output) {
-                                    $alt = $output->attributes()->alt;
-                                    if ($alt !== null) {
-                                        $alternates[(string)$alt] = (string)$output;
-                                    } else {
-                                        $alternates[] = (string)$output;
-                                    }
+                            foreach ($text->output->output as $output) {
+                                $alt = $output->attributes()->alt;
+                                if ($alt !== null) {
+                                    $alternates[(string)$alt] = (string)$output;
+                                } else {
+                                    $alternates[] = (string)$output;
                                 }
-
-                                $this->content['output'][] = $alternates;
-                            } else {
-                                $this->content['output'][] = (string)$text->output;
                             }
+
+                            $this->content['output'][] = $alternates;
+                        } else {
+                            $this->content['output'][] = (string)$text->output;
                         }
                     }
                 }
@@ -220,18 +220,17 @@ class I18n
             $files = scandir($langDirectory);
             foreach ($files as $file) {
                 if (stripos($file, '.xml')) {
-                    if (($xml =@ new SimpleXMLElement($langDirectory . DIRECTORY_SEPARATOR . $file, LIBXML_NOWARNING, true)) !== false) {
-                        $lang       = (string)$xml->attributes()->output;
-                        $langName   = (string)$xml->attributes()->name;
-                        $langNative = (string)$xml->attributes()->native;
+                    $xml        =@ new SimpleXMLElement($langDirectory . DIRECTORY_SEPARATOR . $file, LIBXML_NOWARNING, true);
+                    $lang       = (string)$xml->attributes()->output;
+                    $langName   = (string)$xml->attributes()->name;
+                    $langNative = (string)$xml->attributes()->native;
 
-                        foreach ($xml->locale as $locale) {
-                            $region = (string)$locale->attributes()->region;
-                            $name   = (string)$locale->attributes()->name;
-                            $native = (string)$locale->attributes()->native;
-                            $native .= ' (' . $langName . ', ' . $name . ')';
-                            $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
-                        }
+                    foreach ($xml->locale as $locale) {
+                        $region = (string)$locale->attributes()->region;
+                        $name   = (string)$locale->attributes()->name;
+                        $native = (string)$locale->attributes()->native;
+                        $native .= ' (' . $langName . ', ' . $name . ')';
+                        $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
                     }
                 } else if (stripos($file, '.json')) {
                     $json = json_decode(file_get_contents($langDirectory . DIRECTORY_SEPARATOR . $file), true);
