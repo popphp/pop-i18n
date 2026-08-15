@@ -48,13 +48,12 @@ class I18n
     protected ?string $locale = null;
 
     /**
-     * Language content
+     * Language content, keyed by source string. Each value is either the
+     * translated output string, or an array of alternate outputs (keyed by
+     * their 'alt' name when named, otherwise numerically).
      * @var array
      */
-    protected array $content = [
-        'source' => [],
-        'output' => []
-    ];
+    protected array $content = [];
 
     /**
      * Constructor
@@ -106,7 +105,7 @@ class I18n
     }
 
     /**
-     * Load language content from an XML file
+     * Load language content from an XML or JSON file
      *
      * @param  string $langFile
      * @throws Exception|\Exception
@@ -114,65 +113,10 @@ class I18n
      */
     public function loadFile(string $langFile): void
     {
-        // If an XML file
         if (file_exists($langFile) && (stripos($langFile, '.xml') !== false)) {
-            $xml    =@ new SimpleXMLElement($langFile, LIBXML_NOWARNING, true);
-            $key    = 0;
-            $length = count($xml->locale);
-
-            // Find the locale node key
-            for ($i = 0; $i < $length; $i++) {
-                if ($this->locale == (string)$xml->locale[$i]->attributes()->region) {
-                    $key = $i;
-                }
-            }
-
-            // If the locale node matches the current locale
-            if ($this->locale == (string)$xml->locale[$key]->attributes()->region) {
-                foreach ($xml->locale[$key]->text as $text) {
-                    if (isset($text->source) && isset($text->output)) {
-                        $this->content['source'][] = (string)$text->source;
-                        if (isset($text->output->output)) {
-                            $alternates = [];
-
-                            foreach ($text->output->output as $output) {
-                                $alt = $output->attributes()->alt;
-                                if ($alt !== null) {
-                                    $alternates[(string)$alt] = (string)$output;
-                                } else {
-                                    $alternates[] = (string)$output;
-                                }
-                            }
-
-                            $this->content['output'][] = $alternates;
-                        } else {
-                            $this->content['output'][] = (string)$text->output;
-                        }
-                    }
-                }
-            }
-        // Else if a JSON file
+            $this->loadXmlFile($langFile);
         } else if (file_exists($langFile) && (stripos($langFile, '.json') !== false)) {
-            $json = json_decode(file_get_contents($langFile), true);
-
-            $key    = 0;
-            $length = count($json['language']['locale']);
-
-            // Find the locale node key
-            for ($i = 0; $i < $length; $i++) {
-                if ($this->locale == $json['language']['locale'][$i]['region']) {
-                    $key = $i;
-                }
-            }
-
-            if ($this->locale == $json['language']['locale'][$key]['region']) {
-                foreach ($json['language']['locale'][$key]['text'] as $text) {
-                    if (isset($text['source']) && isset($text['output'])) {
-                        $this->content['source'][] = (string)$text['source'];
-                        $this->content['output'][] = (is_array($text['output'])) ? $text['output'] : (string)$text['output'];
-                    }
-                }
-            }
+            $this->loadJsonFile($langFile);
         } else {
             throw new Exception('Error: The language file ' . $langFile . ' does not exist or is not valid.');
         }
@@ -205,7 +149,7 @@ class I18n
     }
 
     /**
-     * Get languages from the XML files
+     * Get languages from the language files in the directory
      *
      * @param string $dir
      * @return array
@@ -219,32 +163,10 @@ class I18n
         if (file_exists($langDirectory)) {
             $files = scandir($langDirectory);
             foreach ($files as $file) {
-                if (stripos($file, '.xml')) {
-                    $xml        =@ new SimpleXMLElement($langDirectory . DIRECTORY_SEPARATOR . $file, LIBXML_NOWARNING, true);
-                    $lang       = (string)$xml->attributes()->output;
-                    $langName   = (string)$xml->attributes()->name;
-                    $langNative = (string)$xml->attributes()->native;
-
-                    foreach ($xml->locale as $locale) {
-                        $region = (string)$locale->attributes()->region;
-                        $name   = (string)$locale->attributes()->name;
-                        $native = (string)$locale->attributes()->native;
-                        $native .= ' (' . $langName . ', ' . $name . ')';
-                        $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
-                    }
-                } else if (stripos($file, '.json')) {
-                    $json = json_decode(file_get_contents($langDirectory . DIRECTORY_SEPARATOR . $file), true);
-                    $lang       = $json['language']['output'];
-                    $langName   = $json['language']['name'];
-                    $langNative = $json['language']['native'];
-
-                    foreach ($json['language']['locale'] as $locale) {
-                        $region = $locale['region'];
-                        $name   = $locale['name'];
-                        $native = $locale['native'];
-                        $native .= ' (' . $langName . ', ' . $name . ')';
-                        $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
-                    }
+                if (stripos($file, '.xml') !== false) {
+                    $langsAry = array_merge($langsAry, self::getXmlLanguages($langDirectory . DIRECTORY_SEPARATOR . $file));
+                } else if (stripos($file, '.json') !== false) {
+                    $langsAry = array_merge($langsAry, self::getJsonLanguages($langDirectory . DIRECTORY_SEPARATOR . $file));
                 }
             }
         }
@@ -261,17 +183,16 @@ class I18n
      * @param  mixed             $variation
      * @return string
      */
-    protected function translate(string $str, string|array|null$params = null, mixed $variation = null): string
+    protected function translate(string $str, string|array|null $params = null, mixed $variation = null): string
     {
-        $key   = array_search($str, $this->content['source']);
         $trans = null;
 
-        if (($key !== false) && isset($this->content['output'][$key])) {
-            if (($variation !== null) && isset($this->content['output'][$key][$variation])) {
-                $trans = $this->content['output'][$key][$variation];
+        if (isset($this->content[$str])) {
+            $output = $this->content[$str];
+            if (($variation !== null) && is_array($output) && isset($output[$variation])) {
+                $trans = $output[$variation];
             } else {
-                $trans = (is_array($this->content['output'][$key])) ?
-                    reset($this->content['output'][$key]) : $this->content['output'][$key];
+                $trans = (is_array($output)) ? reset($output) : $output;
             }
         }
 
@@ -291,7 +212,7 @@ class I18n
     }
 
     /**
-     * Get language content from the XML file
+     * Get language content from the current language/locale's file, if it exists
      *
      * @throws Exception
      * @return void
@@ -303,6 +224,136 @@ class I18n
         } else if (file_exists($this->directory . $this->language . '.json')) {
             $this->loadFile($this->directory . $this->language . '.json');
         }
+    }
+
+    /**
+     * Load language content from an XML file into $content
+     *
+     * @param  string $langFile
+     * @throws \Exception
+     * @return void
+     */
+    protected function loadXmlFile(string $langFile): void
+    {
+        $xml = @new SimpleXMLElement($langFile, LIBXML_NOWARNING, true);
+        $key = null;
+        $i   = 0;
+
+        // Find the locale node key matching the current locale
+        // (SimpleXMLElement's foreach key is the tag name, not a position, so track it manually)
+        foreach ($xml->locale as $locale) {
+            if ($this->locale == (string)$locale->attributes()->region) {
+                $key = $i;
+                break;
+            }
+            $i++;
+        }
+
+        if ($key !== null) {
+            foreach ($xml->locale[$key]->text as $text) {
+                if (isset($text->source) && isset($text->output)) {
+                    $source = (string)$text->source;
+
+                    if (isset($text->output->output)) {
+                        $alternates = [];
+
+                        foreach ($text->output->output as $output) {
+                            $alt = $output->attributes()->alt;
+                            if ($alt !== null) {
+                                $alternates[(string)$alt] = (string)$output;
+                            } else {
+                                $alternates[] = (string)$output;
+                            }
+                        }
+
+                        $this->content[$source] = $alternates;
+                    } else {
+                        $this->content[$source] = (string)$text->output;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Load language content from a JSON file into $content
+     *
+     * @param  string $langFile
+     * @return void
+     */
+    protected function loadJsonFile(string $langFile): void
+    {
+        $json = json_decode(file_get_contents($langFile), true);
+        $key  = null;
+
+        // Find the locale node key matching the current locale
+        foreach ($json['language']['locale'] as $i => $locale) {
+            if ($this->locale == $locale['region']) {
+                $key = $i;
+                break;
+            }
+        }
+
+        if ($key !== null) {
+            foreach ($json['language']['locale'][$key]['text'] as $text) {
+                if (isset($text['source']) && isset($text['output'])) {
+                    $this->content[(string)$text['source']] = (is_array($text['output'])) ? $text['output'] : (string)$text['output'];
+                }
+            }
+        }
+    }
+
+    /**
+     * Get language info from a single XML language file
+     *
+     * @param  string $file
+     * @return array
+     * @throws \Exception
+     */
+    protected static function getXmlLanguages(string $file): array
+    {
+        $langsAry = [];
+
+        $xml        =@ new SimpleXMLElement($file, LIBXML_NOWARNING, true);
+        $lang       = (string)$xml->attributes()->output;
+        $langName   = (string)$xml->attributes()->name;
+        $langNative = (string)$xml->attributes()->native;
+
+        foreach ($xml->locale as $locale) {
+            $region = (string)$locale->attributes()->region;
+            $name   = (string)$locale->attributes()->name;
+            $native = (string)$locale->attributes()->native;
+            $native .= ' (' . $langName . ', ' . $name . ')';
+            $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
+        }
+
+        return $langsAry;
+    }
+
+    /**
+     * Get language info from a single JSON language file
+     *
+     * @param  string $file
+     * @return array
+     */
+    protected static function getJsonLanguages(string $file): array
+    {
+        $langsAry = [];
+
+        $json       = json_decode(file_get_contents($file), true);
+        $lang       = $json['language']['output'];
+        $langName   = $json['language']['name'];
+        $langNative = $json['language']['native'];
+
+        foreach ($json['language']['locale'] as $locale) {
+            $region = $locale['region'];
+            $name   = $locale['name'];
+            $native = $locale['native'];
+            $native .= ' (' . $langName . ', ' . $name . ')';
+            $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
+        }
+
+        return $langsAry;
     }
 
 }
