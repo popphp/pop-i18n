@@ -2,7 +2,7 @@ pop-i18n
 ========
 
 [![Build Status](https://github.com/popphp/pop-i18n/workflows/phpunit/badge.svg)](https://github.com/popphp/pop-i18n/actions)
-[![Coverage Status](http://cc.popphp.org/coverage.php?comp=pop-i18n)](http://cc.popphp.org/pop-i18n/)
+[![Coverage Status](https://cc.popphp.org/coverage.php?comp=pop-i18n)](https://cc.popphp.org/pop-i18n/)
 
 [![Join the chat at https://discord.gg/TZjgT74U7E](https://media.popphp.org/img/discord.svg)](https://discord.gg/TZjgT74U7E)
 
